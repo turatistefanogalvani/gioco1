@@ -1,101 +1,98 @@
 function startGame() {
+    myGamePiece.loadImages(running);
     myGameArea.start();
-    myGameArea.draw(redSquare);
-    animatedObject.loadImages();
-    };
+}
 
-var animatedObject = {
+var myGamePiece = {
     speedX: 0,
     speedY: 0,
     width: 60,
     height: 60,
     x: 10,
     y: 120,
-    imageList: [], //Vettore che conterrà tutte le immagini caricate
-    contaFrame: 0, //Tiene conto di quanti frame sono passati
-    actualFrame: 0, //Specifica quale frame disegnare
+    imageList: [], // Array to store loaded images
+    contaFrame: 0, // Frame counter
+    actualFrame: 0, // Current frame to display
+    image: null, // Current image
+
     update: function() {
-      this.x += this.speedX;
-      this.y += this.speedY;
-      this.contaFrame++;
-      if (this.contaFrame == 50) {
-        this.contaFrame = 0;
-        this.actualFrame = (1 + this.actualFrame) % this.imageList.length;
-        //console.log(this.actualFrame);
-              this.image = this.imageList[this.actualFrame];
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.contaFrame++;
+        if (this.contaFrame == 50) { // Change frame every 50 frames
+            this.contaFrame = 0;
+            this.actualFrame = (this.actualFrame + 1) % this.imageList.length;
+            this.image = this.imageList[this.actualFrame];
+        }
+    },
+
+    loadImages: function(running) {
+        console.log("prova");
+        for (let imgPath of running) {
+            var img = new Image();
+            img.src = imgPath;
+            this.imageList.push(img);
+        }
+        this.image = this.imageList[this.actualFrame];
     }
-  },
-
-  loadImages: function() {
-     for (imgPath of running) {
-      var img = new Image(this.width, this.height);
-      img.src = imgPath;
-      this.imageList.push(img);
-      //console.log(img);
-    }
-    this.image = this.imageList[this.actualFrame];
-  },
-
-  loadImages: function() {
-    this.image = new Image(this.width, this.height);
-    this.image.src = "gioco2/sprite/Run1"; //Qui metti una tua immagine
-    }
-};
-      
-
-
-function updateGameArea() {
-    myGameArea.clear();
-    myGameArea.draw(redSquare);
-    myGameArea.drawGameObject(animatedObject);
-    //myGameArea.drawGameObject(animatedObject);
-  };
-
-var redSquare = {
-    width: 20,
-    height: 20,
-    x: 10,
-    y: 120,
-    color: "red"
 };
 
 var myGameArea = {
-    canvas : document.createElement("canvas"),
-    start : function() {
+    canvas: document.createElement("canvas"),
+    context: null,
+    interval: null,
+
+    start: function() {
         this.canvas.width = 480;
         this.canvas.height = 270;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-        this.interval = setInterval(updateGameArea, 20);
+        this.interval = setInterval(updateGameArea, 1); // Update game every 20ms
     },
-    draw: function(component) {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        this.context.fillStyle = component.color;
-        this.context.fillRect(component.x, component.y, component.width, component.height);
+
+    clear: function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     },
-    drawGameObject: function(gameObject) {
+
+    drawGameObject: function (gameObject) {
         this.context.drawImage(
-          gameObject.image,
-          gameObject.x,
-          gameObject.y,
-          gameObject.width,
-          gameObject.height
+            gameObject.image,
+            gameObject.x,
+            gameObject.y,
+            gameObject.width,
+            gameObject.height
         );
     }
 };
 
+var running = ['spirite/Run1.png', 'spirite/Run2.png', 'spirite/Run3.png']; // Example paths for images
+
+
+
+function updateGameArea() {
+    myGameArea.clear();
+    myGamePiece.update();
+    myGameArea.drawGameObject(myGamePiece);
+}
+
+// Control functions
 function moveup() {
-    redSquare.y -= 30;
+    myGamePiece.speedY -= 0.4; 
 }
-  
+
 function movedown() {
-    redSquare.y += 30;
+    myGamePiece.speedY += 0.4; 
 }
-  
+
 function moveleft() {
-    redSquare.x -= 30;
+    myGamePiece.speedX -= 0.4; 
 }
-  
+
 function moveright() {
-    redSquare.x += 30;
+    myGamePiece.speedX += 0.4; 
+}
+
+function clearmove() {
+    myGamePiece.speedX = 0; 
+    myGamePiece.speedY = 0; 
 }
