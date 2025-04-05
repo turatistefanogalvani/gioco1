@@ -2,6 +2,10 @@ function startGame() {
     myGamePiece.loadImages(running);
     bushObject.loadImages();
     crateObject.loadImages();
+    blockObject.loadImages();
+    dueblockObject.loadImages();
+    fiveblockObject.loadImages();
+    tuboUnoObject.loadImages();
     myGameArea.start();
 }
 
@@ -18,15 +22,23 @@ var myGamePiece = {
     image: null, // Current image
     tryX: 0,
     tryY: 0,
+    gravity: 0.1, // forza della gravità
+    gravitySpeed: 0, // velocità verticale influenzata dalla gravità
+
 
     update: function() {
-        this.tryY = this.y + this.speedY;
+        this.gravitySpeed += this.gravity;
+        this.tryY = this.y + this.speedY + this.gravitySpeed;
         this.tryX = this.x + this.speedX;
-    
+        
+        const collidesWithBlock = this.crashWith(blockObject);
         const collidesWithBush = this.crashWith(bushObject);
         const collidesWithCrate = this.crashWith(crateObject);
+        const collidesWithfiveBlock = this.crashWith(fiveblockObject);
+        const collidesWithdueBlock = this.crashWith(dueblockObject);
+        const collidesWithtubouno = this.crashWith(tuboUnoObject);
     
-        if (!collidesWithBush && !collidesWithCrate) {
+        if (!collidesWithBush && !collidesWithCrate && !collidesWithBlock && !collidesWithfiveBlock && !collidesWithdueBlock && !collidesWithtubouno) {
             // Controlla bordi canvas
             if (this.tryX < 0) this.tryX = 0;
             if (this.tryX + this.width > myGameArea.canvas.width)
@@ -35,9 +47,12 @@ var myGamePiece = {
             if (this.tryY + this.height > myGameArea.canvas.height)
                 this.tryY = myGameArea.canvas.height - this.height;
     
-            // Solo se non c'è collisione con entrambi
             this.x = this.tryX;
             this.y = this.tryY;
+        } else {
+            // Se c'è collisione con qualcosa sotto, azzera velocità verticale
+            this.gravitySpeed = 0;
+            this.x = this.tryX;
         }
     
         this.contaFrame++;
@@ -78,58 +93,8 @@ var myGamePiece = {
     }
     
 };
-var myGameArea = {
-    canvas: document.createElement("canvas"),
-    context: null,
-    interval: null,
 
-    start: function() {
-        this.canvas.width = 480;
-        this.canvas.height = 270;
-        this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-        this.interval = setInterval(updateGameArea, 1); // Update game every 20ms
-    },
-
-    clear: function() {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    },
-
-    drawGameObject: function (gameObject) {
-        this.context.drawImage(
-            gameObject.image,
-            gameObject.x,
-            gameObject.y,
-            gameObject.width,
-            gameObject.height
-        );
-    }
-};
-var bushObject = {
-    width: 100,
-    height: 50,
-    x: 100,
-    y: 270 - 50,
-    image : null,
-    loadImages: function() {
-        
-      this.image = new Image(this.width, this.height);
-      this.image.src = "https://i.ibb.co/CPdHYdB/Bush-1.png";
-    }
-  };
-
-var crateObject = {
-    width: 100,
-    height: 100,
-    x: 200,
-    y: 270 - 100,
-  
-    loadImages: function() {
-      this.image = new Image(this.width, this.height);
-      this.image.src = "https://i.ibb.co/GMgf32L/Crate.png";
-    }
-  };
-var running = ['spirite/Run1.png', 'spirite/Run2.png', 'spirite/Run3.png']; // Example paths for images
+var running = ['spirite2/mario1.png', 'spirite2/mario2.png', 'spirite2/mario3.png']; // Example paths for images
 
 function updateGameArea() {
     myGameArea.clear();
@@ -137,6 +102,10 @@ function updateGameArea() {
     myGameArea.drawGameObject(myGamePiece);
     myGameArea.drawGameObject(bushObject);
     myGameArea.drawGameObject(crateObject);
+    myGameArea.drawGameObject(blockObject);
+    myGameArea.drawGameObject(fiveblockObject);
+    myGameArea.drawGameObject(dueblockObject);
+    myGameArea.drawGameObject(tuboUnoObject);
 }
 
 // Control functions
@@ -159,4 +128,9 @@ function moveright() {
 function clearmove() {
     myGamePiece.speedX = 0; 
     myGamePiece.speedY = 0; 
+}
+
+function jump() {
+    // Salto verso l'alto
+    myGamePiece.gravitySpeed = -5;
 }
