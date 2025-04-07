@@ -22,12 +22,13 @@ var myGamePiece = {
         
         const collidesWithBlock = this.crashWith(blockObject);
         const collidesWithBush = this.crashWith(bushObject);
+        const collidesWithBushdue = this.crashWith(bushObjectdue);
         const collidesWithCrate = this.crashWith(crateObject);
         const collidesWithfiveBlock = this.crashWith(fiveblockObject);
         const collidesWithdueBlock = this.crashWith(dueblockObject);
         const collidesWithtubouno = this.crashWith(tuboUnoObject);
     
-        if (!collidesWithBush && !collidesWithCrate && !collidesWithBlock && !collidesWithfiveBlock && !collidesWithdueBlock && !collidesWithtubouno) {
+        if (!collidesWithBush && !collidesWithCrate && !collidesWithBlock && !collidesWithfiveBlock && !collidesWithdueBlock && !collidesWithtubouno && !collidesWithBushdue) {
             // Controlla bordi canvas
             if (this.tryX < 0) this.tryX = 0;
             if (this.tryX + this.width > myGameArea.canvas.width)

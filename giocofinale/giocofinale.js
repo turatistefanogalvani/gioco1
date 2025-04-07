@@ -1,6 +1,7 @@
 function startGame() {
     myGamePiece.loadImages(running);
     bushObject.loadImages();
+    bushObjectdue.loadImages();
     crateObject.loadImages();
     blockObject.loadImages();
     dueblockObject.loadImages();
@@ -17,13 +18,14 @@ function updateGameArea() {
     myGamePiece.update();
     myGameArea.drawGameObject(myGamePiece);
     myGameArea.drawGameObject(bushObject);
+    myGameArea.drawGameObject(bushObjectdue);
     myGameArea.drawGameObject(crateObject);
     myGameArea.drawGameObject(blockObject);
     myGameArea.drawGameObject(fiveblockObject);
     myGameArea.drawGameObject(dueblockObject);
     myGameArea.drawGameObject(tuboUnoObject);
 }
-/*
+
 // Control functions
 document.addEventListener('keydown', function(event) {
     switch (event.key.toLowerCase()) {
@@ -46,14 +48,14 @@ document.addEventListener('keyup', function(event) {
             clearmove();
             break;
     }
-}); */
+}); 
 // Funzioni di controllo
 function moveleft() {
-    myGamePiece.speedX = -2; // Velocità a sinistra
+    myGamePiece.speedX = -1; // Velocità a sinistra
 }
 
 function moveright() {
-    myGamePiece.speedX = 2; // Velocità a destra
+    myGamePiece.speedX = 1; // Velocità a destra
 }
 
 function clearmove() {

@@ -4,7 +4,7 @@ var myGameArea = {
     interval: null,
 
     start: function() {
-        this.canvas.width = window.innerWidth;
+        this.canvas.width = 1900;
         this.canvas.height = 570;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
@@ -26,9 +26,22 @@ var myGameArea = {
     }
 };
 var bushObject = {
-    width: window.innerHeight,
+    width: 950,
     height: 50,
     x: 0,
+    y: 350,
+    image : null,
+    loadImages: function() {
+        
+      this.image = new Image(this.width, this.height);
+      this.image.src = "immagini/pavimentogioco.png";
+    }
+  };
+
+  var bushObjectdue = {
+    width: 1050,
+    height: 50,
+    x: 950,
     y: 350,
     image : null,
     loadImages: function() {
