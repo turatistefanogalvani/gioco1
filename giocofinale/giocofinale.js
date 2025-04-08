@@ -9,7 +9,8 @@ function startGame() {
     tuboUnoObject.loadImages();
     tuboDueObject.loadImages();
     myGameArea.start();
-}
+    suono();
+}  
 
 function updateGameArea() {
     myGameArea.clear();
@@ -64,3 +65,10 @@ function clearmove() {
 function jump() {
         myGamePiece.gravitySpeed = -4; // Forza del salto
     }
+
+function suono() {
+    const audio = new Audio('canzonesottofondo.mp3');
+    audio.volume = 0.1; // Imposta il volume a 10%
+    audio.loop = true; // Ripeti il suono
+    audio.play();
+    };

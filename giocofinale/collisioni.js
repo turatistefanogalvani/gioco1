@@ -15,40 +15,86 @@ var myGamePiece = {
     gravitySpeed: 0, // velocità verticale influenzata dalla gravità
 
 
-    update: function() {
+    crashWith: function(otherobj) {
+        var myleft = this.tryX;
+        var myright = this.tryX + this.width;
+        var mytop = this.tryY;
+        var mybottom = this.tryY + this.height;
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + otherobj.width;
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + otherobj.height;
+    
+        var crash = false;
+        if ((mybottom > othertop) && (mytop < otherbottom) && (myright > otherleft) && (myleft < otherright)) {
+            crash = true;
+        }
+        return crash;
+    },
+    
+    update: function () {
         this.gravitySpeed += this.gravity;
-        this.tryY = this.y + this.speedY + this.gravitySpeed;
+    
+        // Tentativo di movimento orizzontale
         this.tryX = this.x + this.speedX;
-        
-        const collidesWithBlock = this.crashWith(blockObject);
-        const collidesWithBush = this.crashWith(bushObject);
-        const collidesWithBushdue = this.crashWith(bushObjectdue);
-        const collidesWithCrate = this.crashWith(crateObject);
-        const collidesWithfiveBlock = this.crashWith(fiveblockObject);
-        const collidesWithdueBlock = this.crashWith(dueblockObject);
-        const collidesWithtubouno = this.crashWith(tuboUnoObject);
-        const collidesWithtubodue = this.crashWith(tuboDueObject);
+        let collisionX = false;
     
-        if (!collidesWithBush && !collidesWithCrate && 
-            !collidesWithBlock && !collidesWithfiveBlock && 
-            !collidesWithdueBlock && !collidesWithtubouno && 
-            !collidesWithBushdue && !collidesWithtubodue) {
-            // Controlla bordi canvas
-            if (this.tryX < 0) this.tryX = 0;
-            if (this.tryX + this.width > myGameArea.canvas.width)
-                this.tryX = myGameArea.canvas.width - this.width;
-            if (this.tryY < 0) this.tryY = 0;
-            if (this.tryY + this.height > myGameArea.canvas.height)
-                this.tryY = myGameArea.canvas.height - this.height;
-    
-            this.x = this.tryX;
-            this.y = this.tryY;
-        } else {
-            // Se c'è collisione con qualcosa sotto, azzera velocità verticale
-            this.gravitySpeed = 0;
-            this.x = this.tryX;
+        const objects = [blockObject, bushObject, bushObjectdue, crateObject, fiveblockObject, dueblockObject, tuboUnoObject, tuboDueObject];
+        for (const obj of objects) {
+            const testX = {
+                tryX: this.tryX,
+                tryY: this.y, // usa y attuale
+                width: this.width,
+                height: this.height,
+                crashWith: this.crashWith
+            };
+            if (this.crashWith.call(testX, obj)) {
+                collisionX = true;
+                break;
+            }
         }
     
+        if (!collisionX) {
+            this.x = this.tryX;
+        } else {
+            this.speedX = 0;
+        }
+    
+        // Tentativo di movimento verticale
+        this.tryY = this.y + this.speedY + this.gravitySpeed;
+        let collisionY = false;
+    
+        for (const obj of objects) {
+            const testY = {
+                tryX: this.x, // usa x aggiornata
+                tryY: this.tryY,
+                width: this.width,
+                height: this.height,
+                crashWith: this.crashWith
+            };
+            if (this.crashWith.call(testY, obj)) {
+                collisionY = true;
+                break;
+            }
+        }
+    
+        if (!collisionY) {
+            this.y = this.tryY;
+        } else {
+            this.gravitySpeed = 0;
+        }
+    
+        // Controlla bordi canvas
+        if (this.x < 0) this.x = 0;
+        if (this.x + this.width > myGameArea.canvas.width)
+            this.x = myGameArea.canvas.width - this.width;
+        if (this.y < 0) this.y = 0;
+        if (this.y + this.height > myGameArea.canvas.height) {
+            this.y = myGameArea.canvas.height - this.height;
+            this.gravitySpeed = 0;
+        }
+    
+        // Gestione animazione
         this.contaFrame++;
         if (this.contaFrame == 50) {
             this.contaFrame = 0;
@@ -65,22 +111,5 @@ var myGamePiece = {
             this.imageList.push(img);
         }
         this.image = this.imageList[this.actualFrame];
-    },
-    crashWith: function(otherobj) {
-    var myleft = this.tryX;
-    var myright = this.tryX + this.width;
-    var mytop = this.tryY;
-    var mybottom = this.tryY + this.height;
-    var otherleft = otherobj.x;
-    var otherright = otherobj.x + otherobj.width;
-    var othertop = otherobj.y;
-    var otherbottom = otherobj.y + otherobj.height;
-
-    var crash = false;
-    if ((mybottom > othertop) && (mytop < otherbottom) && (myright > otherleft) && (myleft < otherright)) {
-        crash = true;
     }
-    return crash;
-},
-    
 };
