@@ -1,8 +1,8 @@
 var myGamePiece = {
     speedX: 0,
     speedY: 0,
-    width: 60,
-    height: 60,
+    width: 40,
+    height: 40,
     x: 10,
     y: 120,
     imageList: [], // Array to store loaded images
@@ -27,8 +27,12 @@ var myGamePiece = {
         const collidesWithfiveBlock = this.crashWith(fiveblockObject);
         const collidesWithdueBlock = this.crashWith(dueblockObject);
         const collidesWithtubouno = this.crashWith(tuboUnoObject);
+        const collidesWithtubodue = this.crashWith(tuboDueObject);
     
-        if (!collidesWithBush && !collidesWithCrate && !collidesWithBlock && !collidesWithfiveBlock && !collidesWithdueBlock && !collidesWithtubouno && !collidesWithBushdue) {
+        if (!collidesWithBush && !collidesWithCrate && 
+            !collidesWithBlock && !collidesWithfiveBlock && 
+            !collidesWithdueBlock && !collidesWithtubouno && 
+            !collidesWithBushdue && !collidesWithtubodue) {
             // Controlla bordi canvas
             if (this.tryX < 0) this.tryX = 0;
             if (this.tryX + this.width > myGameArea.canvas.width)
@@ -63,23 +67,20 @@ var myGamePiece = {
         this.image = this.imageList[this.actualFrame];
     },
     crashWith: function(otherobj) {
-        var myleft = this.tryX;
-        var myright = this.tryX + this.width;
-        var mytop = this.tryY;
-        var mybottom = this.tryY + this.height;
-        var otherleft = otherobj.x;
-        var otherright = otherobj.x + otherobj.width;
-        var othertop = otherobj.y;
-        var otherbottom = otherobj.y + otherobj.height;
-    
-        if ((mybottom >= othertop) &&
-            (mytop <= otherbottom) &&
-            (myright >= otherleft) &&
-            (myleft <= otherright)) {
-            return true; // Collisione
-        }
-    
-        return false; // Nessuna collisione
+    var myleft = this.tryX;
+    var myright = this.tryX + this.width;
+    var mytop = this.tryY;
+    var mybottom = this.tryY + this.height;
+    var otherleft = otherobj.x;
+    var otherright = otherobj.x + otherobj.width;
+    var othertop = otherobj.y;
+    var otherbottom = otherobj.y + otherobj.height;
+
+    var crash = false;
+    if ((mybottom > othertop) && (mytop < otherbottom) && (myright > otherleft) && (myleft < otherright)) {
+        crash = true;
     }
+    return crash;
+},
     
 };

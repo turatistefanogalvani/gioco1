@@ -110,3 +110,15 @@ var tuboUnoObject = {
         this.image.src = "immagini/tubo1.png"; // Esempio immagine
     }
 };
+
+var tuboDueObject = {
+    width: 50,
+    height: 150,
+    x: 1150,
+    y: 200,
+    image: null,
+    loadImages: function() {
+        this.image = new Image(this.width, this.height);
+        this.image.src = "immagini/tubo1.png"; // Esempio immagine
+    }
+};

@@ -1,12 +1,8 @@
 var running = [
-    "spirite/Run1.png",
-    "spirite/Run2.png",
-    "spirite/Run3.png",
-    "spirite/Run4.png",
-    "spirite/Run5.png",
-    "spirite/Run6.png",
-    "spirite/Run7.png",
-    "spirite/Run8.png",
-    "spirite/Run9.png",
-    "spirite/Run10.png"
+    "spirite2/a.png",
+    "spirite2/b.png",
+    "spirite2/c.png",
+    "spirite2/d.png",
+    "spirite2/e.png",
+    "spirite2/f.png",
 ];

@@ -7,11 +7,9 @@ function startGame() {
     dueblockObject.loadImages();
     fiveblockObject.loadImages();
     tuboUnoObject.loadImages();
+    tuboDueObject.loadImages();
     myGameArea.start();
 }
-
-
-var running = ['spirite2/mario1.png', 'spirite2/mario2.png', 'spirite2/mario3.png']; // Example paths for images
 
 function updateGameArea() {
     myGameArea.clear();
@@ -24,6 +22,7 @@ function updateGameArea() {
     myGameArea.drawGameObject(fiveblockObject);
     myGameArea.drawGameObject(dueblockObject);
     myGameArea.drawGameObject(tuboUnoObject);
+    myGameArea.drawGameObject(tuboDueObject);
 }
 
 // Control functions
