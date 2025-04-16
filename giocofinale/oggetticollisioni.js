@@ -2,6 +2,7 @@ var myGameArea = {
     canvas: document.createElement("canvas"),
     context: null,
     interval: null,
+    
 
     start: function() {
         this.canvas.width = 1900;
@@ -112,10 +113,10 @@ var tuboUnoObject = {
 };
 
 var tuboDueObject = {
-    width: 50,
-    height: 150,
+    width: 60,
+    height: 120,
     x: 1150,
-    y: 200,
+    y: 230,
     image: null,
     loadImages: function() {
         this.image = new Image(this.width, this.height);

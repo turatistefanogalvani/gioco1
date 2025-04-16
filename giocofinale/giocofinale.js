@@ -9,6 +9,7 @@ function startGame() {
     tuboUnoObject.loadImages();
     tuboDueObject.loadImages();
     myGameArea.start();
+    update1();
     suono();
 }  
 

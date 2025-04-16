@@ -1,0 +1,38 @@
+body {
+    background-color: #fadadd;
+    font-family: Arial, sans-serif;
+}
+
+canvas {
+    background-image: url("immagini/sfondo.png");
+    background-repeat: repeat; /* Evita la ripetizione dell'immagine */
+    background-size: auto 350px; /* Imposta l'altezza a 600px mantenendo le proporzioni */
+    display: flex;
+    justify-content: center;
+    border: 2px solid #a9a9a9;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+button {
+    font-size: 20px;
+    border-radius: 10px;
+    padding: 10px 15px;
+    border: none;
+    background-color: #ffb6c1;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background-color: #ff69b4;
+    transform: scale(1.1);
+}
+
+.container {
+    display: flex;
+    justify-content: center; /* centro orizzontale */
+    align-items: center;     /* centro verticale */        /* o un'altezza fissa */
+  }
+  
