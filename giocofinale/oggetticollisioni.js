@@ -6,7 +6,7 @@ var myGameArea = {
 
     start: function() {
         this.canvas.width = 1900;
-        this.canvas.height = 570;
+        this.canvas.height = 670;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         this.interval = setInterval(updateGameArea, 1); // Update game every 20ms
