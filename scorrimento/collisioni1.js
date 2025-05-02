@@ -1,4 +1,4 @@
-import { terreno } from './scorrimento.js'; // Importa la matrice terreno
+
 
 const immaginiTerreno = {
     0: "immagini/cielo.png",
@@ -85,16 +85,11 @@ var myGamePiece = {
         }
     },
 
-    loadImages: function (running, idle) {
+    loadImages: function (running) {
         for (let imgPath of running) {
             var img = new Image();
             img.src = imgPath;
             this.imageListRunning.push(img);
-        }
-        for (let imgPath of idle) {
-            var img = new Image();
-            img.src = imgPath;
-            this.imageListIdle.push(img);
         }
         this.image = this.imageListRunning[this.actualFrame];
         this.imageList = this.imageListIdle;
@@ -110,10 +105,10 @@ var myGameArea = {
     backgroundSpeed: 1, // Velocità dello sfondo
 
     start: function () {
-        this.canvas.width = 480;
-        this.canvas.height = 270;
+        
         this.context = this.canvas.getContext("2d");
-
+        this.canvas.width = 1900;
+        this.canvas.height = 670;
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
 
         this.interval = setInterval(updateGameArea, 1); // Impostato a 1ms per migliorare il controllo
@@ -123,6 +118,8 @@ var myGameArea = {
         window.addEventListener('keyup', function (e) {
             myGameArea.keys[e.key] = false;
         });
+
+        maxBackgroundX = (terreno[0].length * 25 - 2*(myGameArea.canvas.width)); // Limite massimo verso destra del terreno
     },
 
     clear: function () {
@@ -156,8 +153,7 @@ var myGameArea = {
 
 
 var minBackgroundX = 0; // Limite massimo verso sinistra del terreno
-var maxBackgroundX = -(terreno[0].length * 25 - 2*(myGameArea.canvas.width)); // Limite massimo verso destra del terreno
-
+var maxBackgroundX = 0; 
 
 function collisioni() {
     const tileSize = 25; // Dimensione di ogni cella della matrice in pixel
@@ -168,18 +164,19 @@ function collisioni() {
     const row = Math.floor((myGamePiece.y + myGamePiece.height) / tileSize);
 
     // Verifica se il personaggio è sopra un'isola
-    if (row >= 0 && row < terreno.length && col >= 0 && col < terreno[row].length) {
-        const tile = terreno[row][col];
-        if (tile === 6 || tile === 7 || tile === 8) { // Blocchi dell'isola
-            const islandTop = row * tileSize;
-            if (myGamePiece.y + myGamePiece.height > islandTop) {
-                myGamePiece.y = islandTop - myGamePiece.height; // Posiziona il personaggio sopra l'isola
-                myGamePiece.gravitySpeed = 0; // Ferma la caduta
-                myGamePiece.isJumping = false; // Il personaggio non è più in salto
-            }
+    if (row < terreno.length && col >= 0 && col < terreno[row].length) {
+        const numero = terreno[row][col];
+        if (numero == 1) { // Se il personaggio è sopra un'isola
+            myGamePiece.y = row * tileSize - myGamePiece.height; // Posiziona il personaggio sopra l'isola
+            myGamePiece.gravitySpeed = 0; // Ferma la gravità
+        } else if (numero == 2) { // Se il personaggio è sopra un blocco giallo
+            myGamePiece.y = row * tileSize - myGamePiece.height; // Posiziona il personaggio sopra il blocco giallo
+            myGamePiece.gravitySpeed = 0; // Ferma la gravità
+        } else if (numero == 3) { // Se il personaggio è sopra l'acqua finale
+            alert("Hai vinto!");
+            clearInterval(myGameArea.interval); // Ferma il gioco
         }
-    }
-}
+    };
 
 function updateGameArea() {
     myGameArea.clear(); // Cancella la canvas
@@ -245,7 +242,5 @@ function updateGameArea() {
     collisioni(); // Controlla la collisione con le isole
     myGameArea.drawGameObject(myGamePiece); // Disegna il personaggio sopra il terreno
 }
-// Avvia il gioco quando il DOM ha finito di caricarsi
-document.addEventListener("DOMContentLoaded", function () {
-    startGame();
-});
+// Avvia il gioco quando il DOM ha finito di caricar
+}
