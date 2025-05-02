@@ -1,7 +1,5 @@
-
-
 const immaginiTerreno = {
-    0: "immagini/cielo.png",
+    0: null,
     1: "immagini/pavimento.png",
     2: "immagini/bloccogiallo.png",
     3: "immagini/acquafinale.png",
@@ -86,14 +84,25 @@ var myGamePiece = {
     },
 
     loadImages: function (running) {
+        let loadedCount = 0;
+    
         for (let imgPath of running) {
-            var img = new Image();
+            const img = new Image();
+            img.onload = () => {
+                loadedCount++;
+                if (loadedCount === running.length) {
+                    this.imageListRunning = [...this.imageListRunning];
+                    this.imageList = this.imageListRunning;
+                    this.image = this.imageList[0];
+                    myGameArea.start();
+                }
+            };
             img.src = imgPath;
             this.imageListRunning.push(img);
         }
-        this.image = this.imageListRunning[this.actualFrame];
-        this.imageList = this.imageListIdle;
     }
+    
+    
 };
 
 var myGameArea = {
@@ -105,12 +114,10 @@ var myGameArea = {
     backgroundSpeed: 1, // Velocità dello sfondo
 
     start: function () {
-        
-        this.context = this.canvas.getContext("2d");
-        this.canvas.width = 1900;
-        this.canvas.height = 670;
+        this.canvas.width = 1080;
+        this.canvas.height = 500;
+        this.context = this.canvas.getContext("2d"); // <--- AGGIUNGI QUESTA RIGA
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-
         this.interval = setInterval(updateGameArea, 1); // Impostato a 1ms per migliorare il controllo
         window.addEventListener('keydown', function (e) {
             myGameArea.keys[e.key] = true;
@@ -128,6 +135,8 @@ var myGameArea = {
     },
 
     drawGameObject: function (gameObject) {
+        if (!gameObject.image) return; // ⛔ Evita drawImage se l'immagine non è pronta
+    
         if (specchia_immagine) {
             this.context.save();
             this.context.scale(-1, 1);
@@ -149,6 +158,7 @@ var myGameArea = {
             );
         }
     }
+    
 };
 
 
@@ -163,35 +173,33 @@ function collisioni() {
     const col = Math.floor((myGamePiece.x - offsetX + myGamePiece.width / 2) / tileSize);
     const row = Math.floor((myGamePiece.y + myGamePiece.height) / tileSize);
 
-    // Verifica se il personaggio è sopra un'isola
+    // Verifica se il personaggio è sopra un blocco solido
     if (row < terreno.length && col >= 0 && col < terreno[row].length) {
         const numero = terreno[row][col];
-        if (numero == 1) { // Se il personaggio è sopra un'isola
-            myGamePiece.y = row * tileSize - myGamePiece.height; // Posiziona il personaggio sopra l'isola
-            myGamePiece.gravitySpeed = 0; // Ferma la gravità
-        } else if (numero == 2) { // Se il personaggio è sopra un blocco giallo
-            myGamePiece.y = row * tileSize - myGamePiece.height; // Posiziona il personaggio sopra il blocco giallo
-            myGamePiece.gravitySpeed = 0; // Ferma la gravità
-        } else if (numero == 3) { // Se il personaggio è sopra l'acqua finale
+        if (numero == 1 || numero == 2) { // pavimento o blocco giallo
+            myGamePiece.y = row * tileSize - myGamePiece.height;
+            myGamePiece.gravitySpeed = 0;
+            myGamePiece.isJumping = false;
+        } else if (numero == 3) { // acqua finale
             alert("Hai vinto!");
             clearInterval(myGameArea.interval); // Ferma il gioco
         }
-    };
+    }
+}
 
+// 🔄 Ora la funzione è globale, visibile anche a setInterval
 function updateGameArea() {
     myGameArea.clear(); // Cancella la canvas
     drawTerreno(); // Disegna il terreno sopra la canvas
 
     myGamePiece.speedX = 0;
 
-    // Controlla se il personaggio deve saltare
     if (myGameArea.keys["ArrowUp"]) {
         myGamePiece.jump();
     }
 
-    // Controlla il movimento orizzontale
     if (myGamePiece.x >= (myGameArea.canvas.width / 2)) {
-        myGamePiece.x = myGameArea.canvas.width / 2; // Blocca il personaggio a metà canvas
+        myGamePiece.x = myGameArea.canvas.width / 2;
 
         if (myGameArea.keys["ArrowLeft"]) {
             if (myGameArea.backgroundX < minBackgroundX) {
@@ -232,15 +240,17 @@ function updateGameArea() {
         }
     }
 
-    // Se nessun tasto è premuto, metti il personaggio in modalità idle
     if (!myGameArea.keys["ArrowLeft"] && !myGameArea.keys["ArrowRight"]) {
         myGamePiece.speedX = 0;
         myGamePiece.imageList = myGamePiece.imageListIdle;
     }
 
     myGamePiece.update(); // Aggiorna la posizione del personaggio
-    collisioni(); // Controlla la collisione con le isole
-    myGameArea.drawGameObject(myGamePiece); // Disegna il personaggio sopra il terreno
+    collisioni(); // Verifica le collisioni
+    myGameArea.drawGameObject(myGamePiece); // Disegna il personaggio
 }
+
 // Avvia il gioco quando il DOM ha finito di caricar
-}
+document.addEventListener("DOMContentLoaded", function () {
+    startGame();
+});
