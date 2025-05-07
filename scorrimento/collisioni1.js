@@ -102,7 +102,6 @@ var myGamePiece = {
                     if (tile === 1 || tile === 2 || tile === 4 || tile === 5 || tile === 6 || tile === 7 || tile === 8 || tile === 9) return true;
                     if (tile === 3) {
                         this.respawn();
-                        alert("Hai perso!");
                          // Rigenera il personaggio
                         return false;
                     }
@@ -113,13 +112,39 @@ var myGamePiece = {
     },
     
     respawn: function () {
-        this.x = 10;
-        this.y = 174-60;
-        this.gravitySpeed = 0;
-        this.speedX = 0;
-        this.speedY = 0;
-        this.isJumping = false;
-        console.log(`Respawn: x=${this.x}, y=${this.y}`);
+        // Mostra un overlay con il messaggio e il pulsante
+        const overlay = document.createElement("div");
+        overlay.id = "game-over-overlay";
+        overlay.style.position = "fixed";
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100%";
+        overlay.style.height = "100%";
+        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+        overlay.style.display = "flex";
+        overlay.style.flexDirection = "column";
+        overlay.style.justifyContent = "center";
+        overlay.style.alignItems = "center";
+        overlay.style.color = "white";
+        overlay.style.fontSize = "24px";
+        overlay.style.zIndex = "1000";
+    
+        const message = document.createElement("p");
+        message.textContent = "Hai perso!";
+        overlay.appendChild(message);
+    
+        const button = document.createElement("button");
+        button.textContent = "Respawn";
+        button.style.padding = "10px 20px";
+        button.style.fontSize = "18px";
+        button.style.cursor = "pointer";
+        button.addEventListener("click", () => {
+            document.body.removeChild(overlay); // Rimuove l'overlay
+            location.reload(); // Riavvia il gioco
+        });
+        overlay.appendChild(button);
+    
+        document.body.appendChild(overlay);
     },
 
     loadImages: function (running) {
