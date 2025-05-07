@@ -5,6 +5,10 @@ const immaginiTerreno = {
     3: "immagini/acquafinale.png",
     4: "immagini/bloccogiallo.png",
     5: "immagini/bloccomattone.png",
+    6: "immagini/tubo1.png",
+    7: "immagini/tubo2.png",
+    8: "immagini/tubo3.png",
+    9: "immagini/tubo4.png",
 };
 
 function drawTerreno() {
@@ -30,7 +34,7 @@ var myGamePiece = {
     speedY: 0,
     width: 60,
     height: 60,
-    x: 10,
+    x: 0,
     y: 174,
     gravity: 0.3,
     gravitySpeed: 0,
@@ -41,8 +45,6 @@ var myGamePiece = {
     contaFrame: 0,
     actualFrame: 0,
     image: null,
-    tryX: 0,
-    tryY: 0,
 
     update: function () {
         this.gravitySpeed += this.gravity;
@@ -84,12 +86,12 @@ var myGamePiece = {
     checkCollision: function (nextX, nextY) {
         const tileSize = 25;
         const offsetX = myGameArea.backgroundX;
-
+    
         const left = Math.floor((nextX - offsetX) / tileSize);
         const right = Math.floor((nextX + this.width - offsetX) / tileSize);
         const top = Math.floor(nextY / tileSize);
         const bottom = Math.floor((nextY + this.height) / tileSize);
-
+    
         for (let row = top; row <= bottom; row++) {
             for (let col = left; col <= right; col++) {
                 if (
@@ -97,10 +99,11 @@ var myGamePiece = {
                     col >= 0 && col < terreno[0].length
                 ) {
                     const tile = terreno[row][col];
-                    if (tile === 1 || tile === 2 || tile === 4 || tile === 5) return true;
+                    if (tile === 1 || tile === 2 || tile === 4 || tile === 5 || tile === 6 || tile === 7 || tile === 8 || tile === 9) return true;
                     if (tile === 3) {
-                        alert("Hai vinto!");
-                        clearInterval(myGameArea.interval);
+                        this.respawn();
+                        alert("Hai perso!");
+                         // Rigenera il personaggio
                         return false;
                     }
                 }
@@ -108,24 +111,35 @@ var myGamePiece = {
         }
         return false;
     },
+    
+    respawn: function () {
+        this.x = 10;
+        this.y = 174-60;
+        this.gravitySpeed = 0;
+        this.speedX = 0;
+        this.speedY = 0;
+        this.isJumping = false;
+        console.log(`Respawn: x=${this.x}, y=${this.y}`);
+    },
 
     loadImages: function (running) {
+        let self = this;
         let loadedCount = 0;
         for (let imgPath of running) {
             const img = new Image();
             img.onload = () => {
                 loadedCount++;
                 if (loadedCount === running.length) {
-                    this.imageList = this.imageListRunning;
-                    this.image = this.imageList[0];
+                    self.imageList = self.imageListRunning;
+                    self.image = self.imageList[0];
                     myGameArea.start();
                 }
             };
             img.src = imgPath;
-            this.imageListRunning.push(img);
+            self.imageListRunning.push(img);
         }
     }
-};
+}; // <- CHIUSURA dell'oggetto myGamePiece
 
 const myGameArea = {
     canvas: document.getElementById("myCanvas"),
@@ -133,16 +147,14 @@ const myGameArea = {
     interval: null,
     keys: [],
     backgroundX: 0,
-    backgroundSpeed: 1,
-    backgroundX: 0,         // manteniamo questo a 0
-    backgroundSpeed: 0,
+    backgroundSpeed: 2.5,
 
     start: function () {
         this.canvas.width = 1080;
         this.canvas.height = 500;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-        this.interval = setInterval(updateGameArea, 20);
+        this.interval = setInterval(updateGameArea, 30);
 
         window.addEventListener("keydown", function (e) {
             myGameArea.keys[e.key] = true;
@@ -150,8 +162,6 @@ const myGameArea = {
         window.addEventListener("keyup", function (e) {
             myGameArea.keys[e.key] = false;
         });
-
-        maxBackgroundX = (terreno[0].length * 25 - 2 * (myGameArea.canvas.width));
     },
 
     clear: function () {
@@ -183,8 +193,8 @@ const myGameArea = {
     }
 };
 
-let minBackgroundX = 0;
-let maxBackgroundX = 0;
+var minBackgroundX = 0; // Limite massimo verso sinistra del terreno
+var maxBackgroundX = -(terreno[0].length * 25 - 2*(myGameArea.canvas.width)); // Limite massimo verso destra del terreno
 
 function updateGameArea() {
     myGameArea.clear();
@@ -192,24 +202,66 @@ function updateGameArea() {
 
     myGamePiece.speedX = 0;
 
-    if (myGameArea.keys["ArrowLeft"]) {
-        myGamePiece.speedX = -3;
-        specchia_immagine = true;
-        myGamePiece.imageList = myGamePiece.imageListRunning;
-    }
-    if (myGameArea.keys["ArrowRight"]) {
-        myGamePiece.speedX = 3;
-        specchia_immagine = false;
-        myGamePiece.imageList = myGamePiece.imageListRunning;
-    }
-    if (myGameArea.keys["ArrowUp"] && !myGamePiece.isJumping) {
+    if (myGameArea.keys["ArrowUp"]) {
         myGamePiece.jump();
     }
 
-    // Aggiungiamo dei limiti per non far uscire il personaggio dal canvas
+    // Controlla il movimento orizzontale
+    if (myGamePiece.x >= (myGameArea.canvas.width / 2)) {
+        myGamePiece.x = myGameArea.canvas.width / 2; // Blocca il personaggio a metà canvas
+        myGamePiece.imageList = myGamePiece.imageListRunning;
+
+        if (myGameArea.keys["ArrowLeft"]) {
+            if (myGameArea.backgroundX < minBackgroundX) {
+                myGamePiece.speedX = -3;
+                myGamePiece.imageList = myGamePiece.imageListRunning;
+                specchia_immagine = true;
+                myGameArea.backgroundX += myGameArea.backgroundSpeed;
+            }
+        } else if (myGameArea.keys["ArrowRight"]) {
+            if (myGameArea.backgroundX > maxBackgroundX) {
+                myGamePiece.imageList = myGamePiece.imageListRunning;
+                specchia_immagine = false;
+                myGameArea.backgroundX -= myGameArea.backgroundSpeed;
+            }
+        }
+    } else {
+        if (myGameArea.keys["ArrowLeft"]) {
+            if (myGamePiece.x > 0 || myGameArea.backgroundX < minBackgroundX) {
+                if (!(myGamePiece.x == 80 && specchia_immagine == true)) {
+                    myGamePiece.speedX = -3;
+                }
+                if ((myGamePiece.x <= 80 && specchia_immagine == true)) {
+                    myGamePiece.speedX = 0;
+                    if (myGameArea.backgroundX < minBackgroundX) {
+                        myGameArea.backgroundX += myGameArea.backgroundSpeed;
+                    }
+                }
+                myGamePiece.imageList = myGamePiece.imageListRunning;
+                specchia_immagine = true;
+            }
+        }
+        if (myGameArea.keys["ArrowRight"]) {
+            if (myGameArea.backgroundX > maxBackgroundX) {
+                myGamePiece.speedX = 3;
+                myGamePiece.imageList = myGamePiece.imageListRunning;
+                specchia_immagine = false;
+            }
+        }
+    }
+
     if (myGamePiece.tryX < 0) myGamePiece.tryX = 0;
     if (myGamePiece.tryX > myGameArea.canvas.width - myGamePiece.width) {
         myGamePiece.tryX = myGameArea.canvas.width - myGamePiece.width;
+    }
+
+    const canvasCenter = myGameArea.canvas.width / 2;
+    if (myGamePiece.x > canvasCenter && myGameArea.backgroundX > -maxBackgroundX) {
+        myGameArea.backgroundX -= myGamePiece.speedX;
+        myGamePiece.x = canvasCenter;
+    } else if (myGamePiece.x < canvasCenter && myGameArea.backgroundX < minBackgroundX) {
+        myGameArea.backgroundX -= myGamePiece.speedX;
+        myGamePiece.x = canvasCenter;
     }
 
     myGamePiece.update();
@@ -217,14 +269,6 @@ function updateGameArea() {
 }
 
 function startGame() {
-    var running = [
-        "spirite2/a.png",
-        "spirite2/b.png",
-        "spirite2/c.png",
-        "spirite2/d.png",
-        "spirite2/e.png",
-        "spirite2/f.png",
-    ];
     myGamePiece.loadImages(running);
 }
 
