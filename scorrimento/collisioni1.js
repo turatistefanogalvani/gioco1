@@ -9,6 +9,10 @@ const immaginiTerreno = {
     7: "immagini/tubo2.png",
     8: "immagini/tubo3.png",
     9: "immagini/tubo4.png",
+    10: "immagini/blg.png",
+    11: "immagini/filo vittoria.png",
+    12: "immagini/bandiera.png",
+    //13: "immagini/moneta.png",
 };
 
 function drawTerreno() {
@@ -99,9 +103,14 @@ var myGamePiece = {
                     col >= 0 && col < terreno[0].length
                 ) {
                     const tile = terreno[row][col];
-                    if (tile === 1 || tile === 2 || tile === 4 || tile === 5 || tile === 6 || tile === 7 || tile === 8 || tile === 9) return true;
+                    if (tile === 1 || tile === 2 || tile === 4 || tile === 5 || tile === 6 || tile === 7 || tile === 8 || tile === 9 || tile === 10) return true;
                     if (tile === 3) {
                         this.respawn();
+                         // Rigenera il personaggio
+                        return false;
+                    }
+                    if (tile === 11) {
+                        this.vittoria();
                          // Rigenera il personaggio
                         return false;
                     }
@@ -147,6 +156,61 @@ var myGamePiece = {
         document.body.appendChild(overlay);
     },
 
+    vittoria: function () {
+        // Mostra un overlay con il messaggio e il pulsante
+        const overlay = document.createElement("div");
+        overlay.id = "victory-overlay";
+        overlay.style.position = "fixed";
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100%";
+        overlay.style.height = "100%";
+        overlay.style.backgroundColor = "rgba(0, 0, 0, 0.9)";
+        overlay.style.display = "flex";
+        overlay.style.flexDirection = "column";
+        overlay.style.justifyContent = "center";
+        overlay.style.alignItems = "center";
+        overlay.style.color = "white";
+        overlay.style.fontSize = "32px";
+        overlay.style.zIndex = "1000";
+        overlay.style.animation = "fadeIn 1s ease-in-out";
+    
+        const message = document.createElement("h1");
+        message.textContent = "🎉 Complimenti! Hai Vinto! 🎉";
+        message.style.marginBottom = "20px";
+        message.style.textShadow = "2px 2px 5px rgba(0, 0, 0, 0.7)";
+        overlay.appendChild(message);
+    
+        const button = document.createElement("button");
+        button.textContent = "Rigioca";
+        button.style.padding = "15px 30px";
+        button.style.fontSize = "20px";
+        button.style.cursor = "pointer";
+        button.style.border = "none";
+        button.style.borderRadius = "5px";
+        button.style.backgroundColor = "#28a745";
+        button.style.color = "white";
+        button.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+        button.style.transition = "background-color 0.3s ease";
+        button.addEventListener("mouseover", () => {
+            button.style.backgroundColor = "#218838";
+        });
+        button.addEventListener("mouseout", () => {
+            button.style.backgroundColor = "#28a745";
+        });
+        button.addEventListener("click", () => {
+            document.body.removeChild(overlay); // Rimuove l'overlay
+            location.reload(); // Riavvia il gioco
+        });
+        overlay.appendChild(button);
+    
+        // Aggiungi un'animazione di sfondo
+        overlay.style.backgroundImage = "radial-gradient(circle, rgba(255,215,0,1) 0%, rgba(255,140,0,1) 100%)";
+        overlay.style.backgroundSize = "cover";
+    
+        document.body.appendChild(overlay);
+    },
+    
     loadImages: function (running) {
         let self = this;
         let loadedCount = 0;
