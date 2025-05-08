@@ -68,7 +68,7 @@ var myGamePiece = {
             this.isJumping = false;
         }
 
-        if (this.speedX !== 0) {
+        if (this.speedX !== 0 || myGameArea.backgroundX !== 0) {
             this.contaFrame++;
             if (this.contaFrame == 5) {
                 this.contaFrame = 0;
@@ -96,6 +96,8 @@ var myGamePiece = {
         const top = Math.floor(nextY / tileSize);
         const bottom = Math.floor((nextY + this.height) / tileSize);
     
+        console.log(`Collision check: left=${left}, right=${right}, top=${top}, bottom=${bottom}, offsetX=${offsetX}`);
+    
         for (let row = top; row <= bottom; row++) {
             for (let col = left; col <= right; col++) {
                 if (
@@ -106,12 +108,10 @@ var myGamePiece = {
                     if (tile === 1 || tile === 2 || tile === 4 || tile === 5 || tile === 6 || tile === 7 || tile === 8 || tile === 9 || tile === 10) return true;
                     if (tile === 3) {
                         this.respawn();
-                         // Rigenera il personaggio
                         return false;
                     }
                     if (tile === 11) {
                         this.vittoria();
-                         // Rigenera il personaggio
                         return false;
                     }
                 }
@@ -236,7 +236,7 @@ const myGameArea = {
     interval: null,
     keys: [],
     backgroundX: 0,
-    backgroundSpeed: 2.5,
+    backgroundSpeed: 3.5,
 
     start: function () {
         this.canvas.width = 1080;
@@ -298,7 +298,6 @@ function updateGameArea() {
     // Controlla il movimento orizzontale
     if (myGamePiece.x >= (myGameArea.canvas.width / 2)) {
         myGamePiece.x = myGameArea.canvas.width / 2; // Blocca il personaggio a metà canvas
-        myGamePiece.imageList = myGamePiece.imageListRunning;
 
         if (myGameArea.keys["ArrowLeft"]) {
             if (myGameArea.backgroundX < minBackgroundX) {
