@@ -3,7 +3,7 @@ const immaginiTerreno = {
     1: "immagini/pavimento.png",
     2: "immagini/bloccogiallo.png",
     3: "immagini/acquafinale.png",
-    4: "immagini/bloccogiallo.png",
+    4: "immagini/postbloccogiallo.png",
     5: "immagini/bloccomattone.png",
     6: "immagini/tubo1.png",
     7: "immagini/tubo2.png",
@@ -12,15 +12,27 @@ const immaginiTerreno = {
     10: "immagini/blg.png",
     11: "immagini/filo vittoria.png",
     12: "immagini/bandiera.png",
-    //13: "immagini/moneta.png",
+    13: "immagini/bild1.png",
+    14: "immagini/bild2.png",
+    15: "immagini/bild3.png",
+    16: "immagini/bild4.png",
+    17: "immagini/moneta.png",
 };
 
 function drawTerreno() {
     const tileSize = 25;
     const offsetX = myGameArea.backgroundX;
+    
+    console.log("Disegno terreno...");
+    
+    // Prima disegna tutti i tiles normali
     for (let row = 0; row < terreno.length; row++) {
         for (let col = 0; col < terreno[row].length; col++) {
             const numero = terreno[row][col];
+            
+            // Salta le monete, le disegneremo dopo
+            if (numero === 17) continue;
+            
             const immagineSrc = immaginiTerreno[numero];
             if (immagineSrc) {
                 const img = new Image();
@@ -29,6 +41,33 @@ function drawTerreno() {
             }
         }
     }
+    
+    // Poi disegna tutte le monete (sopra tutto il resto)
+    for (let row = 0; row < terreno.length; row++) {
+        for (let col = 0; col < terreno[row].length; col++) {
+            if (terreno[row][col] === 17) {
+                console.log("Disegno moneta in posizione:", row, col);
+                const img = new Image();
+                img.src = immaginiTerreno[17];
+                
+                // Disegna la moneta con dimensioni leggermente più grandi per assicurarsi che sia visibile
+                myGameArea.context.drawImage(
+                    img, 
+                    col * tileSize + offsetX - 2, 
+                    row * tileSize - 2, 
+                    tileSize + 0, 
+                    tileSize + 0
+                );
+            }
+        }
+    }
+    
+    // Disegna la bandiera
+    const bandieraImg = new Image();
+    bandieraImg.src = "immagini/bandiera.png"; // Sostituisci con il percorso corretto
+    const fineTerrenoX = terreno[0].length * tileSize + offsetX - tileSize; // Ultima colonna
+    const fineTerrenoY = (terreno.length - 2) * tileSize; // Penultima riga (ad esempio)
+    myGameArea.context.drawImage(bandieraImg, fineTerrenoX, fineTerrenoY, tileSize, tileSize * 2);
 }
 
 let specchia_immagine = false;
@@ -91,25 +130,78 @@ var myGamePiece = {
         const tileSize = 25;
         const offsetX = myGameArea.backgroundX;
     
+        // Calcola gli indici dei tile che il personaggio sta toccando
         const left = Math.floor((nextX - offsetX) / tileSize);
         const right = Math.floor((nextX + this.width - offsetX) / tileSize);
         const top = Math.floor(nextY / tileSize);
         const bottom = Math.floor((nextY + this.height) / tileSize);
     
-        console.log(`Collision check: left=${left}, right=${right}, top=${top}, bottom=${bottom}, offsetX=${offsetX}`);
-    
+        // Controlla ogni tile nella zona di collisione
+        let collisionDetected = false;
+        
         for (let row = top; row <= bottom; row++) {
             for (let col = left; col <= right; col++) {
-                if (
-                    row >= 0 && row < terreno.length &&
-                    col >= 0 && col < terreno[0].length
-                ) {
+                // Verifica che gli indici siano validi
+                if (row >= 0 && row < terreno.length && col >= 0 && col < terreno[0].length) {
                     const tile = terreno[row][col];
-                    if (tile === 1 || tile === 2 || tile === 4 || tile === 5 || tile === 6 || tile === 7 || tile === 8 || tile === 9 || tile === 10) return true;
+    
+                    // Controlla se è una moneta (tile 17)
+                    if (tile === 17) {
+                        // Posizione della moneta nel canvas
+                        const monX = col * tileSize + offsetX + tileSize/2;
+                        const monY = row * tileSize + tileSize/2;
+                        
+                        // Rimuovi la moneta
+                        terreno[row][col] = 0;
+                        continue; // La moneta non blocca il movimento
+                    }
+                    
+                    // Gestione speciale per il blocco 2 (blocco giallo)
+                    if (tile === 2) {
+                        const tileY = row * tileSize;
+                        const tileBottom = (row + 1) * tileSize;
+                        
+                        // Verifica se il personaggio sta colpendo dal basso in modo semplificato
+                        if (this.gravitySpeed < 0) { // Sta saltando
+                            // Manteniamo temporaneamente il blocco
+                            
+                            // Fai apparire una moneta sopra il blocco
+                            if (row - 1 >= 0) {
+                                terreno[row-1][col] = 17;
+                                
+                                // Forza un aggiornamento immediato del rendering
+                                setTimeout(function() {
+                                    drawTerreno();
+                                }, 50);
+                            }
+                            
+                            // Dopo 2 secondi, sostituisci definitivamente il blocco giallo con lo spazio vuoto (0)
+                            setTimeout(function() {
+                                terreno[row][col] = 4;
+                                drawTerreno();
+                            }, 2000);
+                            
+                            collisionDetected = true;
+                        } else {
+                            // Collisione normale con il blocco
+                            collisionDetected = true;
+                        }
+                    }
+    
+                    // Collisione con blocchi solidi
+                    if (tile === 1 || tile === 4 || tile === 5 || 
+                        tile === 6 || tile === 7 || tile === 8 || 
+                        tile === 9 || tile === 10) {
+                        collisionDetected = true;
+                    }
+    
+                    // Gestione morte del personaggio
                     if (tile === 3) {
                         this.respawn();
                         return false;
                     }
+    
+                    // Gestione vittoria
                     if (tile === 11) {
                         this.vittoria();
                         return false;
@@ -117,7 +209,7 @@ var myGamePiece = {
                 }
             }
         }
-        return false;
+        return collisionDetected; // Restituisce true se è stata rilevata una collisione
     },
     
     respawn: function () {
@@ -228,7 +320,7 @@ var myGamePiece = {
             self.imageListRunning.push(img);
         }
     }
-}; // <- CHIUSURA dell'oggetto myGamePiece
+};
 
 const myGameArea = {
     canvas: document.getElementById("myCanvas"),
