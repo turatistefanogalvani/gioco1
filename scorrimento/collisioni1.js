@@ -17,15 +17,12 @@ const immaginiTerreno = {
     15: "immagini/bild3.png",
     16: "immagini/bild4.png",
     17: "immagini/moneta.png",
+    18: "immagini/bloccooo.png",
 };
 
 function drawTerreno() {
     const tileSize = 25;
     const offsetX = myGameArea.backgroundX;
-    
-    console.log("Disegno terreno...");
-    
-    // Prima disegna tutti i tiles normali
     for (let row = 0; row < terreno.length; row++) {
         for (let col = 0; col < terreno[row].length; col++) {
             const numero = terreno[row][col];
@@ -179,7 +176,28 @@ var myGamePiece = {
                             setTimeout(function() {
                                 terreno[row][col] = 4;
                                 drawTerreno();
-                            }, 2000);
+                            }, 500);
+                            
+                            collisionDetected = true;
+                        } else {
+                            // Collisione normale con il blocco
+                            collisionDetected = true;
+                        }
+                    }
+
+                    if (tile === 18) {
+                        const tileY = row * tileSize;
+                        const tileBottom = (row + 1) * tileSize;
+                        
+                        // Verifica se il personaggio sta colpendo dal basso in modo semplificato
+                        if (this.gravitySpeed < 0) { // Sta saltando
+                            // Manteniamo temporaneamente il blocco
+                            
+                            // Dopo 2 secondi, sostituisci definitivamente il blocco giallo con lo spazio vuoto (0)
+                            setTimeout(function() {
+                                terreno[row][col] = 0;
+                                drawTerreno();
+                            }, 500);
                             
                             collisionDetected = true;
                         } else {
