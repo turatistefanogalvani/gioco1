@@ -1,0 +1,13 @@
+fai unaltra matrice per super mario, la matrice deve essere alta come quella che ti ho mandato,
+ e lunga il doppio, sapendo che const immaginiTerreno = { 0: null, è l'aria 1: "immagini/pavimento.png", 
+ è il pavimneto 2: "immagini/bloccogiallo.png", 2 è il blocco da cui esce il blocco 17 cioe la moneta 3: 
+ "immagini/acquafinale.png", 3 è il mare 4: "immagini/postbloccogiallo.png", 5: "immagini/bloccomattone.png", 
+ 6: "immagini/tubo1.png", 6,7,8,9 sono i tubi 7: "immagini/tubo2.png", 8: "immagini/tubo3.png", 
+ 9: "immagini/tubo4.png", 10: "immagini/blg.png", 11: "immagini/filo vittoria.png", 12: "immagini/bandiera.png", 
+ 13: "immagini/bild1.png", 14: "immagini/bild2.png", 15: "immagini/bild3.png", 16: "immagini/bild4.png", 
+ 17: "immagini/moneta.png", 18: "immagini/bloccooo.png", };   
+ la matrice deve essere alta 19 allora i tubi per crearlo devi metterlo in questa sequenza 9, 10 e sotto 7,8
+fai che le ultime 4 righe di matrice devono essere mare e quelle due sopra terreno, alla fine ci deve essere la bandiera,
+che si crea mettendo 10 sopra il blocco di terreno sopra il 10 8 11 e sopra lultimo 11 il 12, e successimante dopo 6 blocchi
+ci deve essere l'edificio costruito da 15, 16 sopra il terreno e sopra il 15 il 13 e sopra il 16 il 14, fai che non ci siano commenti
+o spazi tra le righe 
